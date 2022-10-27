@@ -139,7 +139,7 @@ class RunPipeline():
         #                         if os.path.splitext(_)[1] == '.npz']) # CV datasets
         #dataset_list_org.extend([os.path.splitext(_)[0] for _ in os.listdir('datasets/NLP_by_BERT')
         #                         if os.path.splitext(_)[1] == '.npz']) # NLP datasets
-        dataset_list_org = glob.glob("/home/lboiar/Data/dami_csv" + "/**/*.csv", recursive=True)
+        dataset_list_org = glob.glob("/home/user/yourpath/ADBench/dami_csv" + "/**/*.csv", recursive=True)
 
         dataset_list = []
         dataset_size = []

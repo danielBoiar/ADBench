@@ -40,8 +40,8 @@ class DataGenerator():
                                 if os.path.splitext(_)[1] == '.npz'] # CV datasets
         self.dataset_list_nlp = [os.path.splitext(_)[0] for _ in os.listdir('datasets/NLP_by_BERT')
                                  if os.path.splitext(_)[1] == '.npz'] # NLP datasets
-        self.dataset_list_dami = glob.glob( "/home/lboiar/Data/dami_csv"+ "/**/*.csv", recursive=True)
-        #self.dataset_list_dami = [line[len("/home/lboiar/Data/dami_csv"):].strip() for line in self.dataset_list_dami]
+        self.dataset_list_dami = glob.glob( "/home/user/yourpath/ADBench/dami_csv"+ "/**/*.csv", recursive=True)
+        #self.dataset_list_dami = [line[len("/home/user/yourpath/ADBench/dami_csv"):].strip() for line in self.dataset_list_dami]
 
         # myutils function
         self.utils = Utils()
