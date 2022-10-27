@@ -4,7 +4,7 @@ import random
 import os
 from math import ceil
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import StandardScaler
 from itertools import combinations
 from sklearn.mixture import GaussianMixture
 
@@ -12,6 +12,7 @@ from copulas.multivariate import VineCopula
 from copulas.univariate import GaussianKDE
 
 from myutils import Utils
+import glob
 
 # currently, data generator only supports for generating the binary classification datasets
 class DataGenerator():
@@ -39,6 +40,8 @@ class DataGenerator():
                                 if os.path.splitext(_)[1] == '.npz'] # CV datasets
         self.dataset_list_nlp = [os.path.splitext(_)[0] for _ in os.listdir('datasets/NLP_by_BERT')
                                  if os.path.splitext(_)[1] == '.npz'] # NLP datasets
+        self.dataset_list_dami = glob.glob( "/home/lboiar/Data/dami_csv"+ "/**/*.csv", recursive=True)
+        #self.dataset_list_dami = [line[len("/home/lboiar/Data/dami_csv"):].strip() for line in self.dataset_list_dami]
 
         # myutils function
         self.utils = Utils()
@@ -203,7 +206,19 @@ class DataGenerator():
 
         return X, y
 
-    def generator(self, X=None, y=None, minmax=True,
+    def dataLoading(self, path, logfile=None):
+        print("Path",path)
+        df = pd.read_csv(path)
+        labels = df['class'].values
+        x_df = df.drop(['class'], axis=1)
+        x = x_df.values
+        print("Data shape: (%d, %d)" % x.shape)
+        if logfile:
+            logfile.write("Data shape: (%d, %d)\n" % x.shape)
+
+        return x, labels
+
+    def generator(self, X=None, y=None, standardize=True,
                   la=None, at_least_one_labeled=False,
                   realistic_synthetic_mode=None, alpha:int=5, percentage:float=0.1,
                   noise_type=None, duplicate_times:int=2, contam_ratio=1.00, noise_ratio:float=0.05):
@@ -225,6 +240,10 @@ class DataGenerator():
                 data = np.load(os.path.join('datasets', 'CV_by_ResNet18', self.dataset + '.npz'), allow_pickle=True)
             elif self.dataset in self.dataset_list_nlp:
                 data = np.load(os.path.join('datasets', 'NLP_by_BERT', self.dataset + '.npz'), allow_pickle=True)
+            elif self.dataset in self.dataset_list_dami:
+                print(self.dataset)
+                dataX, dataY = self.dataLoading(self.dataset)
+                data={'X':dataX,'y':dataY}
             else:
                 raise NotImplementedError
 
@@ -318,9 +337,9 @@ class DataGenerator():
         elif noise_type == 'label_contamination':
             X_train, y_train = self.add_label_contamination(X_train, y_train, noise_ratio=noise_ratio)
 
-        # minmax scaling
-        if minmax:
-            scaler = MinMaxScaler().fit(X_train)
+        # standarization scaling
+        if standardize:
+            scaler = StandardScaler().fit(X_train)
             X_train = scaler.transform(X_train)
             X_test = scaler.transform(X_test)
 

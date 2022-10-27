@@ -1,3 +1,4 @@
+import glob
 import os
 import logging; logging.basicConfig(level=logging.WARNING)
 import numpy as np
@@ -132,13 +133,13 @@ class RunPipeline():
     # dataset filter for delelting those datasets that do not satisfy the experimental requirement
     def dataset_filter(self):
         # dataset list in the current folder
-        dataset_list_org = [os.path.splitext(_)[0] for _ in os.listdir('datasets/Classical')
-                            if os.path.splitext(_)[1] == '.npz'] # classical AD datasets
-        dataset_list_org.extend([os.path.splitext(_)[0] for _ in os.listdir('datasets/CV_by_ResNet18')
-                                 if os.path.splitext(_)[1] == '.npz']) # CV datasets
-        dataset_list_org.extend([os.path.splitext(_)[0] for _ in os.listdir('datasets/NLP_by_BERT')
-                                 if os.path.splitext(_)[1] == '.npz']) # NLP datasets
-
+        #dataset_list_org = [os.path.splitext(_)[0] for _ in os.listdir('datasets/Classical')
+        #                    if os.path.splitext(_)[1] == '.npz'] # classical AD datasets
+        #dataset_list_org.extend([os.path.splitext(_)[0] for _ in os.listdir('datasets/CV_by_ResNet18')
+        #                         if os.path.splitext(_)[1] == '.npz']) # CV datasets
+        #dataset_list_org.extend([os.path.splitext(_)[0] for _ in os.listdir('datasets/NLP_by_BERT')
+        #                         if os.path.splitext(_)[1] == '.npz']) # NLP datasets
+        dataset_list_org = glob.glob("/home/lboiar/Data/dami_csv" + "/**/*.csv", recursive=True)
 
         dataset_list = []
         dataset_size = []
@@ -176,7 +177,6 @@ class RunPipeline():
 
         # sort datasets by their sample size
         dataset_list = [dataset_list[_] for _ in np.argsort(np.array(dataset_size))]
-
         return dataset_list
 
     # whether the dataset in the NLP / CV dataset
@@ -234,7 +234,7 @@ class RunPipeline():
 
     # run the experiment
     def run(self):
-        #  filteting dataset that does not meet the experimental requirements
+        #  filtering dataset that does not meet the experimental requirements
         dataset_list = self.dataset_filter()
 
         # experimental parameters
@@ -321,5 +321,5 @@ class RunPipeline():
                 df_time_inference.to_csv(os.path.join(os.getcwd(), 'result', 'Time(inference)_' + self.suffix + '.csv'), index=True)
 
 # run the above pipeline for reproducing the results in the paper
-pipeline = RunPipeline(suffix='ADBench', parallel='unsupervise', realistic_synthetic_mode=None, noise_type=None)
+pipeline = RunPipeline(suffix='ADBench', parallel='unsupervise', realistic_synthetic_mode=None, noise_type=None, generate_duplicates=False, n_samples_threshold=1)
 pipeline.run()
